@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.database import init
+from app.configs import app_config
 from app.routes import router
 
 from contextlib import asynccontextmanager
@@ -12,7 +13,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(**app_config, lifespan=lifespan)
 
 
 @app.get("/")
