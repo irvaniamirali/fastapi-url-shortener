@@ -1,10 +1,10 @@
 from tortoise import Model, fields
 
-from app.utils import generate_random_string
-
 
 class URL(Model):
     id = fields.IntField(primary_key=True)
-    target_url = fields.CharField(max_length=2000, unique=True)  # RFC 3986
-    secret_key = fields.CharField(max_length=6, unique=True, default=generate_random_string())
+    url = fields.CharField(max_length=2000)  # RFC 3986
+    key = fields.CharField(max_length=6, unique=True)
     clicks = fields.IntField(default=0)
+    expire = fields.DatetimeField(null=True)
+    admin_url = fields.CharField(max_length=8, unique=True)
