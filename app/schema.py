@@ -1,10 +1,17 @@
 from pydantic import BaseModel, AnyUrl
-
+from datetime import datetime
+from typing import Optional
 
 class URLCreate(BaseModel):
-    target_url: AnyUrl
+    url: AnyUrl
+    expire: Optional[datetime] = None
 
 
 class URL(URLCreate):
-    secret_key: str
+    key: str
     clicks: int
+    admin_url: str
+
+
+class Key(BaseModel):
+    key: str
