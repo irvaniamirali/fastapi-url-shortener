@@ -3,7 +3,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
 from app.models import URL
 
-router = APIRouter(tags=["Redirect"])
+router = APIRouter(tags=["URL"])
 
 
 @router.get("/{key}", status_code=status.HTTP_200_OK)
