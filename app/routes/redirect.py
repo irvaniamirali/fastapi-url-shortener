@@ -3,11 +3,11 @@ from fastapi.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
 from app.models import URL
 
-router = APIRouter(tags=["URL"])
+router = APIRouter(tags=["Redirect URL"])
 
 
-@router.get("/{key}", status_code=status.HTTP_200_OK)
-async def redirect(key: str = Path(..., max_length=6)) -> RedirectResponse:
+@router.get("/{key}", response_class=RedirectResponse, status_code=status.HTTP_200_OK)
+async def redirect(key: str = Path(max_length=6)):
     """
     Redirect the target URL associated with the provided key.
 
@@ -19,7 +19,7 @@ async def redirect(key: str = Path(..., max_length=6)) -> RedirectResponse:
     if exist_url is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="This URL Key does not exist in the database; please create it first."
+            detail="This URL Key does not exist."
         )
 
     exist_url.clicks += 1
