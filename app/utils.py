@@ -3,10 +3,10 @@ import string
 import asyncio
 import datetime
 
-def generate_random_string():
+def generate_random_string(length=6):
     letters = string.ascii_letters + string.digits
-    random_string = lambda length : ''.join(random.choice(letters) for i in range(length))
-    return random_string(6), random_string(8)
+    random_string = ''.join(random.choice(letters) for i in range(length))
+    return random_string
 
 
 async def wait_until(dt):
