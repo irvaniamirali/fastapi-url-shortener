@@ -1,6 +1,6 @@
 # ZipLink
 
-ZipLink is a simple FastAPI app to shorten URLs
+ZipLink is a FastAPI-based URL shortener.
 
 ### Cloning the Project
 To get started with the project, first clone the repository to your local machine using Git:
