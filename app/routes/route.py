@@ -6,6 +6,6 @@ from .redirect import router as redirect_router
 
 router = APIRouter()
 
-router.include_router(admin_router)
-router.include_router(url_router)
+router.include_router(admin_router, prefix="/api")
+router.include_router(url_router, prefix="/api")
 router.include_router(redirect_router)
