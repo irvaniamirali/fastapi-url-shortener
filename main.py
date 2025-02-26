@@ -8,7 +8,9 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Init the database and generate schemas.
+    """
+    Init the database and generate schemas.
+    """
     await init()
     yield
 
