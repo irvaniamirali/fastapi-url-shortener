@@ -4,7 +4,7 @@ from app.utils import generate_random_string, run_task
 from app import schema
 from app.models import URL
 
-router = APIRouter()
+router = APIRouter(tags=["URL"])
 
 async def delete_url(key):
     record = await URL.filter(key=key).first()
