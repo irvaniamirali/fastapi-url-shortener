@@ -43,29 +43,37 @@ async def create_admin_key():
 @router.post("/url", response_model=schema.URLBase, status_code=status.HTTP_200_OK)
 async def create(
         background_tasks: BackgroundTasks,
-        url: schema.AnyUrl = Body(),
+        url: schema.AnyUrl = Body(...),
         expire: Optional[datetime] = Body(default=None),
+        is_active: Optional[bool] = Body(default=True),
         admin: Admin = Depends(get_current_admin)
 ):
     """
-    Create a new URL if it does not already exist.
+    Create a new URL entry if it does not already exist.
 
-    :param expire:
-    :param background_tasks:
-    :param admin:
-    :param url: The URL data to be created.
-    :return: The created URL object.
+    Parameters:
+    - url: The URL to be created.
+    - expire: Optional expiration datetime for the URL.
+    - is_active: Flag to indicate if the URL is active (default is True).
+    - background_tasks: Allows adding background tasks.
+    - admin: The admin user making the request.
+
+    Returns:
+    - The created URL object.
     """
     key = generate_random_string()
 
     if expire is not None:
         background_tasks.add_task(run_task, run_time=expire, coro=delete_url(key))
 
-    return await URL.create(url=url, key=key, expire=expire, admin=admin)
+    return await URL.create(url=url, key=key, expire=expire, is_active=is_active, admin=admin)
 
 
 @router.get("/url", response_model=schema.URLBase, status_code=status.HTTP_200_OK)
-async def fetch_url_information(key: str = Body(), admin: Admin = Depends(get_current_admin)):
+async def fetch_url_information(
+        key: schema.constr(min_length=6, max_length=6, pattern=r'^[a-zA-Z0-9]+$') = Body(...),
+        admin: Admin = Depends(get_current_admin)
+):
     """
     Retrieve the URL associated with the admin key.
 
@@ -79,7 +87,7 @@ async def fetch_url_information(key: str = Body(), admin: Admin = Depends(get_cu
     if exist_url is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="This URL does not exist in the database or admin key is not valid."
+            detail="This URL does not exist in the database or admin key is not valid"
         )
 
     return exist_url
@@ -88,9 +96,10 @@ async def fetch_url_information(key: str = Body(), admin: Admin = Depends(get_cu
 @router.put("/url", response_model=schema.URLBase, status_code=status.HTTP_200_OK)
 async def update(
         background_tasks: BackgroundTasks,
-        url: schema.constr(max_length=255) = Body(),
-        key: schema.constr(min_length=6, max_length=6, pattern=r'^[a-zA-Z0-9]+$') = Body(),
+        key: schema.constr(min_length=6, max_length=6, pattern=r'^[a-zA-Z0-9]+$') = Body(...),
+        url: Optional[schema.AnyUrl] = Body(default=None),
         expire: Optional[datetime] = Body(default=None),
+        is_active: Optional[bool] = Body(default=None),
         admin: Admin = Depends(get_current_admin)
 ):
     """
@@ -111,13 +120,22 @@ async def update(
     if exist_url is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="The URL key or admin key is invalid."
+            detail="The URL key or admin key is invalid"
         )
+
+    if url is None:
+        url = exist_url.url
+
+    if is_active is None:
+        is_active = exist_url.is_active
 
     if expire is not None:
         background_tasks.add_task(run_task, run_time=expire, coro=delete_url(key))
 
-    return await exist_url.update_from_dict({"url": url, "expire": expire})
+    args = {"url": url, "expire": expire, "is_active": is_active}
+    updated_url = await exist_url.update_from_dict(args)
+    await updated_url.save()
+    return updated_url
 
 
 @router.delete("/url", status_code=status.HTTP_200_OK)
