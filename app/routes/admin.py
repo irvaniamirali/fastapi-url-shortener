@@ -41,7 +41,7 @@ async def create_admin_key():
 
 
 @router.post("/url", response_model=schema.URLBase, status_code=status.HTTP_200_OK)
-async def create(
+async def create_url(
         background_tasks: BackgroundTasks,
         url: schema.AnyUrl = Body(...),
         expire: Optional[datetime] = Body(default=None),
@@ -67,7 +67,7 @@ async def create(
 
 
 @router.get("/url", response_model=schema.URLBase, status_code=status.HTTP_200_OK)
-async def fetch_url_information(
+async def get_url_information(
         key: schema.constr(min_length=6, max_length=6, pattern=r'^[a-zA-Z0-9]+$') = Body(...),
         admin: Admin = Depends(get_current_admin)
 ):
@@ -91,7 +91,7 @@ async def fetch_url_information(
 
 
 @router.put("/url", response_model=schema.URLBase, status_code=status.HTTP_200_OK)
-async def update(
+async def update_url(
         background_tasks: BackgroundTasks,
         key: schema.constr(min_length=6, max_length=6, pattern=r'^[a-zA-Z0-9]+$') = Body(...),
         url: Optional[schema.AnyUrl] = Body(default=None),
@@ -134,7 +134,7 @@ async def update(
 
 
 @router.delete("/url", status_code=status.HTTP_200_OK)
-async def delete(admin: Admin = Depends(get_current_admin)):
+async def delete_url_entry(admin: Admin = Depends(get_current_admin)):
     """
     Delete the URL associated with the current admin.
 
