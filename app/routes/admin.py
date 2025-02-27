@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Depends, BackgroundTasks, status
 from fastapi.exceptions import HTTPException
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from app.utils import run_task, generate_random_string
 from app.models import Admin, URL
@@ -15,10 +15,15 @@ async def delete_url(key):
     await record.delete()
 
 
-async def get_current_admin(admin_data: dict = Body(...)):
-    admin_key = admin_data.get("admin_key")
-    admin = await Admin.get_or_none(admin_key=admin_key)
+async def get_current_admin(admin_key: Union[str, dict] = Body()):
+    if isinstance(admin_key, str):
+        admin_key = admin_key
+    elif isinstance(admin_key, dict):
+        admin_key = admin_key.get("admin_key")
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid admin input format")
 
+    admin = await Admin.get_or_none(admin_key=admin_key)
     if not admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid admin key")
 
