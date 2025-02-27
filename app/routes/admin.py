@@ -51,15 +51,12 @@ async def create(
     """
     Create a new URL entry if it does not already exist.
 
-    Parameters:
-    - url: The URL to be created.
-    - expire: Optional expiration datetime for the URL.
-    - is_active: Flag to indicate if the URL is active (default is True).
-    - background_tasks: Allows adding background tasks.
-    - admin: The admin user making the request.
-
-    Returns:
-    - The created URL object.
+    :param url: The URL to be created.
+    :param expire: Optional expiration datetime for the URL.
+    :param is_active: Flag to indicate if the URL is active (default is True).
+    :param background_tasks: Allows adding background tasks.
+    :param admin: The admin user making the request.
+    :return: The created URL object.
     """
     key = generate_random_string()
 
@@ -105,15 +102,13 @@ async def update(
     """
     Update an existing URL entry for the specified admin.
 
-    Parameters:
-    - background_tasks: Background tasks to be run after the response.
-    - url: The new URL to be updated.
-    - key: The unique key identifying the URL entry.
-    - expire: Optional expiration time for the URL.
-    - admin: The admin object for authorization.
-
-    Returns:
-    - The updated URL entry.
+    :param background_tasks: Background tasks to be run after the response.
+    :param key: The unique key identifying the URL entry.
+    :param url: The new URL to be updated.
+    :param expire: Optional expiration time for the URL.
+    :param is_active: Flag to indicate if the URL is active.
+    :param admin: The admin object for authorization.
+    :return: The updated URL entry.
     """
     exist_url = await URL.filter(key=key, admin=admin).first()
 
