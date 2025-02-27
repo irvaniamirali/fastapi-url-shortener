@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, Depends, BackgroundTasks, status
 from fastapi.exceptions import HTTPException
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 from app.utils import run_task, generate_random_string
 from app.models import Admin, URL
@@ -15,10 +15,13 @@ async def delete_url(key):
     await record.delete()
 
 
-async def get_current_admin(admin_key: str = Body(max_length=12)):
+async def get_current_admin(admin_data: dict = Body(...)):
+    admin_key = admin_data.get("admin_key")
     admin = await Admin.get_or_none(admin_key=admin_key)
+
     if not admin:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid admin key")
+
     return admin
 
 
@@ -35,7 +38,7 @@ async def create_admin_key():
 @router.post("/url", response_model=schema.URLBase, status_code=status.HTTP_200_OK)
 async def create(
         background_tasks: BackgroundTasks,
-        url: schema.AnyUrl,
+        url: schema.AnyUrl = Body(),
         expire: Optional[datetime] = Body(default=None),
         admin: Admin = Depends(get_current_admin)
 ):
@@ -51,7 +54,7 @@ async def create(
     key = generate_random_string()
 
     if expire is not None:
-        background_tasks.add_task(run_task, run_time=url, coro=delete_url(key))
+        background_tasks.add_task(run_task, run_time=expire, coro=delete_url(key))
 
     return await URL.create(url=url, key=key, expire=expire, admin=admin)
 
@@ -110,3 +113,35 @@ async def update(
         background_tasks.add_task(run_task, run_time=expire, coro=delete_url(key))
 
     return await exist_url.update_from_dict({"url": url, "expire": expire})
+
+
+@router.delete("/url", status_code=status.HTTP_200_OK)
+async def delete(admin: Admin = Depends(get_current_admin)):
+    """
+    Delete the URL associated with the current admin.
+
+    :param admin: The currently authenticated admin.
+    :return: A confirmation message indicating that the URL has been deleted.
+    :raises HTTPException: If the admin does not have an associated URL.
+    """
+    exist_url = await URL.filter(admin=admin).first()
+
+    if exist_url is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The Admin Key is invalid."
+        )
+
+    await exist_url.delete()
+    return {"message": "The URL has been deleted."}
+
+
+@router.get("/urls", response_model=List[schema.URLBase], status_code=status.HTTP_200_OK)
+async def list_urls(admin: Admin = Depends(get_current_admin)):
+    """
+    Retrieve all URLs associated with the current admin.
+
+    :param admin: The current admin making the request.
+    :return: A list of URL objects.
+    """
+    return await URL.filter(admin=admin).all()
