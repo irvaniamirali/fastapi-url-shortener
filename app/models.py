@@ -13,3 +13,4 @@ class URL(Model):
     clicks = fields.IntField(default=0)
     expire = fields.DatetimeField(null=True)
     admin = fields.ForeignKeyField("models.Admin", related_name="urls")
+    is_active = fields.BooleanField(default=True)
