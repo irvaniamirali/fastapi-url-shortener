@@ -1,11 +1,11 @@
 
 app_config = {
     "title": "ZipLink",
-    "description": "ZipLink is a simple FastAPI app to shorten URLs.",
+    "description": "ZipLink is a FastAPI-based URL shortener.",
     "contact": {
         "name": "AmirAli Irvani",
         "url": "https://github.com/irvaniamirali/ziplink",
-        "email": "irvaniamirali@proton.me",
+        "email": "irvaniamirali.dev@gmail.com",
     },
     "license_info": {
         "name": "Apache 2.0",
