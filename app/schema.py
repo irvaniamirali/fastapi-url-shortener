@@ -12,6 +12,7 @@ class AdminKey(BaseModel):
 class Create(BaseModel):
     url: AnyUrl
     expire: Optional[datetime] = None
+    is_active: Optional[bool] = True
 
 
 class URLBase(Create, Key):
