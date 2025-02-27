@@ -22,6 +22,12 @@ async def redirect(key: str = Path(max_length=6)):
             detail="This URL Key does not exist."
         )
 
+    if not exist_url.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The URL is deactivated by admin"
+        )
+
     exist_url.clicks += 1
     await exist_url.save()
 
