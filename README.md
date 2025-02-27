@@ -27,8 +27,12 @@ uvicorn main:app --reload
 In this command, main is the name of your Python file (without the .py extension) containing the FastAPI app, and app is the instance of FastAPI in that file. After this command, the application will be accessible at http://127.0.0.1:8000.
 
 ### Routes Overview
-- POST `/api/url`: Create a URL
+- POST `/api/admin`: Create Admin Key
 - GET `/api/admin/url`: Get a URL details
+- PUT `/api/admin/url`: Update a URL details
+- POST `/api/admin/url`: Create a URL
+- DELETE `/api/admin/url`: Delete a URL
+- GET `/api/admin/urls`: Get all URLs
 - GET `/{key}`: Redirect to the target URL
 
 ### Contributing
