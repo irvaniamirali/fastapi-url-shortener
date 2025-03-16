@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, HTTPException, BackgroundTasks, Body, status
-from typing import List
+from typing import List, Annotated
 
 from app import utils
 from app.models import User, URL
@@ -16,8 +16,8 @@ async def delete_url(key, user=None):
 @router.post("/", response_model=URLBase, status_code=status.HTTP_201_CREATED)
 async def create_url(
         background_tasks: BackgroundTasks,
+        user: Annotated[User, Depends(get_current_user)],
         url: URLCreate = Body(...),
-        user = Depends(get_current_user)
 ):
     """
     Create a new URL entry for the authenticated user.
@@ -43,7 +43,7 @@ async def create_url(
 
 
 @router.get("/", response_model=URLBase, status_code=status.HTTP_200_OK)
-async def get_url_details(key: Key = Body(...), user: User = Depends(get_current_user)):
+async def get_url_details(user: Annotated[User, Depends(get_current_user)], key: Key = Body(...)):
     """
     Retrieve URL details using a key for the authenticated user.
 
@@ -66,8 +66,8 @@ async def get_url_details(key: Key = Body(...), user: User = Depends(get_current
 @router.put("/", response_model=URLBase, status_code=status.HTTP_200_OK)
 async def update_url(
         background_tasks: BackgroundTasks,
-        url: URLUpdate = Body(...),
-        user: User = Depends(get_current_user)
+        user: Annotated[User, Depends(get_current_user)],
+        url: URLUpdate = Body(...)
 ):
     """
     Update an existing URL entry for the authenticated user.
@@ -86,12 +86,12 @@ async def update_url(
             detail="The URL key or user key is invalid"
         )
 
-    if url.expire:
-        background_tasks.add_task(utils.run_task, run_time=url.expire, coro=delete_url(url.key))
+    if url.expire_date:
+        background_tasks.add_task(utils.run_task, run_time=url.expire_date, coro=delete_url(url.key))
 
     args = {
         "url": url.url or exist_url.url,
-        "expire_date": url.expire or exist_url.expire_date,
+        "expire_date": url.expire_date or exist_url.expire_date,
         "is_active": url.is_active if url.is_active is not None else exist_url.is_active
     }
 
@@ -101,7 +101,7 @@ async def update_url(
 
 
 @router.delete("/", status_code=status.HTTP_200_OK)
-async def delete_url_entry(key: Key = Body(...), user: User = Depends(get_current_user)):
+async def delete_url_entry(user: Annotated[User, Depends(get_current_user)], key: Key = Body(...)):
     """
     Delete a URL entry for the authenticated user.
 
@@ -122,7 +122,7 @@ async def delete_url_entry(key: Key = Body(...), user: User = Depends(get_curren
 
 
 @router.get("/all", response_model=List[URLBase], status_code=status.HTTP_200_OK)
-async def list_urls(user: User = Depends(get_current_user)):
+async def list_urls(user: Annotated[User, Depends(get_current_user)]):
     """
     Retrieve all URLs associated with the authenticated user.
 
