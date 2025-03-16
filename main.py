@@ -1,22 +1,23 @@
 from fastapi import FastAPI
+from tortoise.contrib.fastapi import register_tortoise
 
-from app.database import init
-from app.configs import app_config
+from app.configs import app_config, DATABASE_URL
 from app.routes import router
 
-from contextlib import asynccontextmanager
+app = FastAPI(**app_config)
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """
-    Init the database and generate schemas.
-    """
-    await init()
-    yield
-
-
-app = FastAPI(**app_config, lifespan=lifespan)
-
+register_tortoise(
+    app,
+    db_url=DATABASE_URL,
+    modules={
+        "models": [
+            "app.models.users",
+            "app.models.urls"
+        ]
+    },
+    generate_schemas=True,
+    add_exception_handlers=True,
+)
 
 @app.get("/")
 async def root():
