@@ -25,7 +25,7 @@ async def redirect(key: str = Path(max_length=6)):
     if not exist_url.is_active:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="The URL is deactivated by admin"
+            detail="The URL is deactivated by owner"
         )
 
     exist_url.clicks += 1
