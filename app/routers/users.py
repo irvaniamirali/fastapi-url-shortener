@@ -2,23 +2,23 @@ from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
 from datetime import timedelta
 
-from app import utils
+from app.utils import generate_random_digit_number
 from app.models import User
-from app.schema import UserBase, UserCreate, UserToken, Token
+from app.schema import UserBase, RegisterUser, UserToken, Token
 from app.configs import ACCESS_TOKEN_EXPIRE_MINUTES
-
+from app.security import get_password_hash, verify_password, create_access_token
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 async def authenticate_user(email, password):
     user = await User.filter(email=email).first()
-    if not user or not utils.verify_password(password, user.password):
+    if not user or not verify_password(password, user.password):
         return False
     return user
 
 
 @router.post("/", response_model=UserBase, status_code=status.HTTP_201_CREATED)
-async def create_user(user: UserCreate):
+async def register_user(user: RegisterUser):
     """
     Register a new user with unique email.
 
@@ -35,10 +35,10 @@ async def create_user(user: UserCreate):
         )
 
     params = {
-        "user_id": utils.generate_random_digit_number(),
+        "user_id": generate_random_digit_number(),
         "full_name": user.full_name,
         "email": user.email,
-        "password": utils.get_password_hash(user.password)
+        "password": get_password_hash(user.password)
     }
     return await User.create(**params)
 
@@ -60,7 +60,7 @@ async def login_for_access_token(form_data: UserToken):
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = utils.create_access_token(
+    access_token = create_access_token(
         data={"sub": str(user.user_id)}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
