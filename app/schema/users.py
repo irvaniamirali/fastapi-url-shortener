@@ -14,7 +14,7 @@ class UserToken(BaseModel):
     password: constr(strip_whitespace=True, min_length=8, max_length=25)
 
 
-class UserCreate(BaseModel):
+class RegisterUser(BaseModel):
     email: EmailStr
     full_name: constr(strip_whitespace=True, max_length=50)
     password: constr(strip_whitespace=True, min_length=8, max_length=25)
