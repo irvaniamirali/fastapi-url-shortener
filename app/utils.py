@@ -1,12 +1,13 @@
-import asyncio
+from asyncio import sleep as aiosleep
+from datetime import datetime
+
 import random
 import string
-import datetime
 
 def generate_random_digit_number():
-    first_digit = random.randint(1, 9)
-    remaining_digits = random.randint(10 ** 8, 10 ** 9 - 1)
-    return int(f"{first_digit}{remaining_digits:08d}")
+    first_digit = str(random.randint(1, 9))
+    remaining_digits = random.choices(range(10), k=8)
+    return int(first_digit + ''.join(map(str, remaining_digits)))
 
 def generate_random_string(length=6):
     letters = string.ascii_letters + string.digits
@@ -17,8 +18,8 @@ async def wait_until(dt):
     """
     Sleep until the specified datetime.
     """
-    now = datetime.datetime.now()
-    await asyncio.sleep((dt - now).total_seconds())
+    now = datetime.now()
+    await aiosleep((dt - now).total_seconds())
 
 async def run_task(run_time, coro):
     await wait_until(run_time)
