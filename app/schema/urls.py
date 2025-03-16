@@ -13,5 +13,4 @@ class URLCreate(BaseModel):
 class URLBase(URLCreate, Key):
     clicks: int
 
-class URLUpdate(Key, URLCreate):
-    pass
+class URLUpdate(Key, URLCreate): ...
