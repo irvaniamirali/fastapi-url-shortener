@@ -1,5 +1,6 @@
-from fastapi import APIRouter, status
+from fastapi import Depends, APIRouter, status
 from fastapi.exceptions import HTTPException
+from typing import Annotated
 from datetime import timedelta
 
 from app.utils import generate_random_digit_number
@@ -7,6 +8,7 @@ from app.models import User
 from app.schema import UserBase, RegisterUser, UserToken, Token
 from app.configs import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.security import get_password_hash, verify_password, create_access_token
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -64,3 +66,8 @@ async def login_for_access_token(form_data: UserToken):
         data={"sub": str(user.user_id)}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.get("/me", response_model=UserBase, status_code=status.HTTP_200_OK)
+async def read_user(user: Annotated[User, Depends(get_current_user)]):
+    return user
