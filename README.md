@@ -20,11 +20,11 @@ pip install -r requirements.txt
 ### Environment Variables Setup
 To run the project, you need to set up your environment variables. Follow these steps:
 
-1. Copy the `.env.sample` file to create a new file named `.env` in the root directory of the project:
+Copy the `.env.sample` file to create a new file named `.env` in the root directory of the project:
 ```bash
 cp .env.sample .env
 ```
-2. Open the newly created .env file in a text editor and update the values according to your configuration. 
+Open the newly created .env file in a text editor and update the values according to your configuration. 
 
 ### Running the Application Locally
 To run the application locally, use the following command:
@@ -39,6 +39,7 @@ In this command, main is the name of your Python file (without the .py extension
 #### Users
 - POST `/api/users` Create User
 - POST `/api/users/token` Login for Access Token
+- GET `/api/users/me` Get Details of user
 #### Urls
 - GET `/api/urls`: Get URL details
 - PUT `/api/urls`: Update URL details
