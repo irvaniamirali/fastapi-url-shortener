@@ -21,7 +21,7 @@ def future_date_exception():
 def url_record_missing_exception():
     return HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
-        detail="This URL does not exist in the database or the key you provided is not valid."
+        detail="This URL is not found or the provided key is invalid."
     )
 
 async def delete_url(key, user=None):
