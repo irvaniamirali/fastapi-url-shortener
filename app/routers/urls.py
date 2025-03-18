@@ -1,4 +1,5 @@
 from fastapi import Depends, APIRouter, HTTPException, BackgroundTasks, Body, status
+from datetime import datetime
 from typing import List, Annotated
 
 from app import utils
@@ -8,13 +9,28 @@ from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/urls", tags=["URLs"])
 
+def is_future_date(dt):
+    return datetime.strptime(str(dt), "%Y-%m-%d %H:%M:%S") < datetime.now()
+
+def future_date_exception():
+    raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="The expiration date must be in the future. Please enter a valid date"
+    )
+
+def url_record_missing_exception():
+    return HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="This URL is not found or the provided key is invalid."
+    )
+
 async def delete_url(key, user=None):
     record = await URL.filter(key=key, user=user).first()
     await record.delete() if record else None
 
 
 @router.post("/", response_model=URLBase, status_code=status.HTTP_201_CREATED)
-async def create_url(
+async def create_url_shortcut(
         background_tasks: BackgroundTasks,
         user: Annotated[User, Depends(get_current_user)],
         url: URLCreate = Body(...),
@@ -30,6 +46,9 @@ async def create_url(
     key = utils.generate_random_string()
 
     if url.expire_date:
+        if is_future_date(url.expire_date):
+            raise future_date_exception
+
         background_tasks.add_task(utils.run_task, run_time=url.expire_date, coro=delete_url(key, user))
 
     params = {
@@ -55,16 +74,13 @@ async def get_url_details(user: Annotated[User, Depends(get_current_user)], key:
     exist_url = await URL.filter(user=user, key=key.key).first()
 
     if not exist_url:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="This URL does not exist in the database or user key is not valid"
-        )
+        raise url_record_missing_exception()
 
     return exist_url
 
 
 @router.put("/", response_model=URLBase, status_code=status.HTTP_200_OK)
-async def update_url(
+async def update(
         background_tasks: BackgroundTasks,
         user: Annotated[User, Depends(get_current_user)],
         url: URLUpdate = Body(...)
@@ -81,12 +97,12 @@ async def update_url(
     exist_url = await URL.filter(key=url.key, user=user).first()
 
     if not exist_url:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The URL key or user key is invalid"
-        )
+        raise url_record_missing_exception()
 
     if url.expire_date:
+        if is_future_date(url.expire_date):
+            future_date_exception()
+
         background_tasks.add_task(utils.run_task, run_time=url.expire_date, coro=delete_url(url.key))
 
     args = {
@@ -113,10 +129,7 @@ async def delete_url_entry(user: Annotated[User, Depends(get_current_user)], key
     exist_url = await delete_url(key, user)
 
     if not exist_url:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The URL Key or User Key is invalid"
-        )
+        raise url_record_missing_exception()
 
     return {"message": "The URL has been deleted"}
 
