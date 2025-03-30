@@ -170,4 +170,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-zip-link.sqlite3*
+database.sqlite3*
