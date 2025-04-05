@@ -4,7 +4,7 @@ from jose import JWTError, jwt
 
 from app.models.users import User
 from app.schema.token import TokenData
-from app.configs import SECRET_KEY, ALGORITHM
+from configs import SECRET_KEY, ALGORITHM
 
 
 async def get_user(user_id: int):
