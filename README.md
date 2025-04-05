@@ -1,13 +1,11 @@
-# ZipLink
-
-ZipLink is a FastAPI-based URL shortener.
+This project is a URL shortening service developed using FastAPI. The goal of this project is to provide a simple and fast solution for shortening links and managing them.
 
 ### Cloning the Project
 To get started with the project, first clone the repository to your local machine using Git:
 
 ```shell
-git clone https://github.com/irvaniamirali/zip-link.git
-cd zip-link
+git clone https://github.com/irvaniamirali/fastapi-url-shortener.git
+cd fastapi-url-shortener
 ```
 
 ### Installation Dependencies
@@ -41,11 +39,11 @@ In this command, main is the name of your Python file (without the .py extension
 - POST `/api/users/token` Login for Access Token
 - GET `/api/users/me` Get Details of user
 #### Urls
-- GET `/api/urls`: Get URL details
-- PUT `/api/urls`: Update URL details
-- POST `/api/urls`: Create URL
-- DELETE `/api/urls`: Delete URL
-- GET `/api/urls/all`: Get all URLs of user
+- GET `/api/urls` Get URL details
+- PUT `/api/urls` Update URL details
+- POST `/api/urls` Create URL
+- DELETE `/api/urls` Delete URL
+- GET `/api/urls/all` Get all URLs of user
 #### Redirect
 - GET `/{key}`: Redirect to the target URL
 

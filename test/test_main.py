@@ -1,10 +1,13 @@
-from fastapi.testclient import TestClient
+import pytest
+from httpx import ASGITransport, AsyncClient
 
 from app.main import app
+from base import BASE_URL
 
-client = TestClient(app=app)
+client = AsyncClient(transport=ASGITransport(app=app), base_url=BASE_URL)
 
-def test_read_main():
-    response = client.get("/")
+@pytest.mark.anyio
+async def test_root():
+    response = await client.get("/")
     assert response.status_code == 200
     assert "message" in response.json()

@@ -6,9 +6,9 @@ from datetime import timedelta
 from app.utils import generate_random_digit_number
 from app.models import User
 from app.schema import UserBase, RegisterUser, UserToken, Token
-from app.configs import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.security import get_password_hash, verify_password, create_access_token
 from app.dependencies import get_current_user
+from configs import ACCESS_TOKEN_EXPIRE_MINUTES
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
