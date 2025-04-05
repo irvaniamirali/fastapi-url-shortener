@@ -13,4 +13,7 @@ class URLCreate(BaseModel):
 class URLBase(URLCreate, Key):
     clicks: int
 
-class URLUpdate(Key, URLCreate): ...
+class URLUpdate(Key):
+    url: AnyUrl = None
+    expire_date: Optional[datetime] = None
+    is_active: Optional[bool] = True
