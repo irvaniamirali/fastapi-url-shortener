@@ -1,7 +1,6 @@
 from tortoise import Tortoise, run_async
 
-from app.configs import DATABASE_URL
-
+from configs import DATABASE_URL
 
 async def init():
    await Tortoise.init(
