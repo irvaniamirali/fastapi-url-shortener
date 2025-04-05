@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
-from app.configs import app_config, DATABASE_URL
+from configs import app_config, DATABASE_URL
 from app.routers import router
 
 app = FastAPI(**app_config)
@@ -30,7 +30,7 @@ app.add_middleware(
 
 @app.get("/")
 async def root():
-    return {"message": "ZipLink greets you! Visit the /docs page"}
+    return {"message": "It seems good; Visit the /docs page"}
 
 
 app.include_router(router)
