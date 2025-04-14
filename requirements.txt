@@ -59,6 +59,7 @@ python-jose==3.4.0
 python-multipart==0.0.20
 pytz==2025.1
 PyYAML==6.0.2
+redis==5.2.1
 requests==2.32.3
 rich==13.9.4
 rich-toolkit==0.13.2
