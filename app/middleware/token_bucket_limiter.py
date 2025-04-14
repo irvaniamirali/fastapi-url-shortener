@@ -1,13 +1,12 @@
 import time
 from typing import Optional
 from redis.asyncio import Redis
-from fastapi import HTTPException, status
+from fastapi import status
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from jose import jwt, JWTError
 from starlette.responses import JSONResponse
 
-from app.errors import ErrorCode
 from configs import settings
 
 
