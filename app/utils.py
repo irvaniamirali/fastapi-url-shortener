@@ -1,4 +1,4 @@
-from asyncio import sleep as aiosleep
+from asyncio import sleep
 from datetime import datetime
 
 import random
@@ -19,7 +19,7 @@ async def wait_until(dt):
     Sleep until the specified datetime.
     """
     now = datetime.now()
-    await aiosleep((dt - now).total_seconds())
+    await sleep((dt - now).total_seconds())
 
 async def run_task(run_time, coro):
     await wait_until(run_time)
