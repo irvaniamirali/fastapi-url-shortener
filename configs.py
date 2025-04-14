@@ -1,16 +1,28 @@
-from dotenv import load_dotenv
-from os import getenv
+from pydantic_settings import BaseSettings
 
-load_dotenv()
 
-DATABASE_URL = getenv("DATABASE_URL")
+class Settings(BaseSettings):
+    uvicorn_host: str = "127.0.0.1"
+    uvicorn_port: int = 8000
 
-SECRET_KEY = getenv("SECRET_KEY")
-ALGORITHM = getenv("ALGORITHM", "HS256")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+    secret_key: str
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
 
-HOST = getenv("HOST", "127.0.0.1")
-PORT = int(getenv("PORT", "8000"))
+    database_host: str
+    test_database_host: str
+
+    redis_host: str = "127.0.0.1"
+    redis_port: int = 6379
+
+    max_tokens: int = 10
+    refill_rate_per_second: int = 1
+
+    class Config:
+        env_file = ".env"
+
+
+settings = Settings()  # type: ignore
 
 app_config = {
     "title": "FastAPI URL Shortener",
