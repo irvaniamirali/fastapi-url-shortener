@@ -13,6 +13,14 @@ class URLCreate(BaseModel):
 class URLBase(URLCreate, Key):
     clicks: int
 
+    model_config = {
+        "from_attributes": True,
+        "json_encoders": {
+            AnyUrl: lambda value: str(value),
+        }
+    }
+
+
 class URLUpdate(Key):
     url: AnyUrl = None
     expire_date: Optional[datetime] = None

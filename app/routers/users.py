@@ -5,18 +5,20 @@ from datetime import timedelta
 
 from app.utils import generate_random_digit_number
 from app.models import User
-from app.schema import UserBase, RegisterUser, UserToken, Token
+from app.schema.users import UserBase, RegisterUser, UserToken
+from app.schema.token import Token
 from app.security import get_password_hash, verify_password, create_access_token
 from app.dependencies import get_current_user
-from configs import ACCESS_TOKEN_EXPIRE_MINUTES
+from app.errors import ErrorCode
+from configs import settings
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
-async def authenticate_user(email, password):
+async def authenticate_user(email: str, password: str) -> User | None:
     user = await User.filter(email=email).first()
-    if not user or not verify_password(password, user.password):
-        return False
-    return user
+    if user and verify_password(password, user.password):
+        return user
+    return None
 
 
 @router.post("/", response_model=UserBase, status_code=status.HTTP_201_CREATED)
@@ -28,12 +30,10 @@ async def register_user(user: RegisterUser):
     :return: The created UserBase object.
     :raises HTTPException: If the email is already taken.
     """
-    exist_user = await User.filter(email=user.email).first()
-
-    if exist_user:
+    if await User.filter(email=user.email).first():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already taken."
+            detail=ErrorCode.EMAIL_ALREADY_EXIST
         )
 
     params = {
@@ -54,20 +54,20 @@ async def login_for_access_token(form_data: UserToken):
     :return: Token schema containing access token.
     :raises HTTPException: If authentication fails.
     """
-    user = await authenticate_user(form_data.email, form_data.password)
+    user = await authenticate_user(form_data.email, form_data.password)  # type: ignore
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
+            detail=ErrorCode.INCORRECT_USER_AUTH_INPUT,
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={"sub": str(user.user_id)}, expires_delta=access_token_expires
     )
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
 
 
 @router.get("/me", response_model=UserBase, status_code=status.HTTP_200_OK)
-async def read_user(user: Annotated[User, Depends(get_current_user)]):
-    return user
+async def read_user(current_user: Annotated[User, Depends(get_current_user)]):
+    return current_user

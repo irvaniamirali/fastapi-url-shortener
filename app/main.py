@@ -1,31 +1,31 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import HTTPException
 from tortoise.contrib.fastapi import register_tortoise
 
-from configs import app_config, DATABASE_URL
+from app.handlers import custom_http_exception_handler
+from app.middleware import add_middlewares
+from configs import app_config, settings
 from app.routers import router
 
 app = FastAPI(**app_config)
 
+app.add_exception_handler(HTTPException, custom_http_exception_handler)  # type: ignore
+
+# Add all middlewares here
+add_middlewares(app)
+
 register_tortoise(
     app,
-    db_url=DATABASE_URL,
+    db_url=settings.database_host,
     modules={
         "models": [
             "app.models.users",
-            "app.models.urls"
+            "app.models.urls",
+            "app.models.rate_limiter"
         ]
     },
     generate_schemas=True,
     add_exception_handlers=True,
-)
-
-app.add_middleware(
-    CORSMiddleware,  # type: ignore
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
 )
 
 @app.get("/")
