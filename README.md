@@ -10,7 +10,6 @@ It features user authentication, rate-limiting using the **Token Bucket Algorith
 - JWT Authentication
 - Token Bucket Rate Limiting
 - URL Shortening and Redirection
-- Async Testing with `pytest`
 - Dockerized for Deployment
 - Rotating Log File Support
 - Modular Project Structure
