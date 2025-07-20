@@ -1,0 +1,35 @@
+# docker-compose.yml
+
+services:
+  # سرویس FastAPI
+  app:
+    build: . # Dockerfile در همین دایرکتوری است
+    ports:
+      - "8000:8000" # مپ کردن پورت 8000 کانتینر به پورت 8000 هاست
+    volumes:
+      - .:/app # مپ کردن دایرکتوری فعلی به /app در کانتینر (برای توسعه)
+    environment:
+      # پاس دادن متغیرهای محیطی از فایل .env هاست
+      # توجه: برای Production باید از متغیرهای محیطی مستقیم یا Secret Management استفاده کنید
+      REDIS_URL: "redis://redis:6379/0" # آدرس Redis در شبکه Docker Compose
+      DATABASE_URL: "sqlite+aiosqlite:///./shortener.db" # اگر از SQLite در کانتینر استفاده می‌کنید
+      # باقی متغیرها از .env را اینجا اضافه کنید، یا از یک فایل .env برای Docker Compose استفاده کنید
+      # SECRET_KEY: ${SECRET_KEY}
+      # LOG_LEVEL: ${LOG_LEVEL}
+      # RATE_LIMIT_REGISTER_TIMES: ${RATE_LIMIT_REGISTER_TIMES}
+      # ...
+    depends_on:
+      - redis # اطمینان از اینکه Redis قبل از app راه‌اندازی می‌شود
+    env_file: # استفاده از فایل .env برای لود کردن متغیرها
+      - ./.env
+
+  # سرویس Redis
+  redis:
+    image: "redis:7-alpine" # ایمیج Redis
+    ports:
+      - "6379:6379" # مپ کردن پورت 6379 Redis به پورت 6379 هاست
+    volumes:
+      - redis_data:/data # دیتای Redis را پایدار نگه می‌دارد
+
+volumes:
+  redis_data: # تعریف حجم برای پایداری داده‌های Redis
