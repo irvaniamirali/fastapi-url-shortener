@@ -5,7 +5,8 @@ class Settings(BaseSettings):
     """
     Application settings loaded from environment variables or a .env file.
     """
-    PROJECT_NAME: str = "URL Shortener"
+    PROJECT_NAME: str = "FastAPI URL Shortener"
+    DESCRIPTION: str = "FastAPI URL Shortener"
     VERSION: str = "0.1.0"
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./shortener.db"
@@ -17,11 +18,11 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
-    # Redis settings for Rate Limiting
-    REDIS_URL: str = "redis://localhost:6379/0"
-
     # Logging settings
     LOG_LEVEL: str = "INFO"
+
+    # Redis settings for Rate Limiting
+    REDIS_URL: str = "redis://localhost:6379/0"
 
     # Rate Limiting settings
     RATE_LIMIT_REGISTER_TIMES: int = 5
