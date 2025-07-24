@@ -28,7 +28,7 @@ This project is a simple and fast URL shortener API built using FastAPI. It allo
 
 - Pydantic: Data validation and settings management (used by FastAPI and for .env handling).
 
-- [Your Chosen Database]: (e.g., SQLAlchemy for PostgreSQL/SQLite, Motor for MongoDB, etc.) - You'll need to specify your actual database here.
+- SQLAlchemy for PostgreSQL/SQLite
 
 ---
 
@@ -73,7 +73,7 @@ Open the newly created `.env` file and update the variables according to your sp
 To start the FastAPI application:
 
 ```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app:main --reload --host 0.0.0.0 --port 8000
 ```
 This will run the application on http://localhost:8000. The --reload flag enables auto-reloading on code changes, which is great for development.
 
